@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap");
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  background-image: url("./background.png");
+  background-position: center;
+  background-size: cover;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(136, 136, 136, 0.281);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dots {
+  width: 21.1px;
+  height: 21.1px;
+  background: #474bff;
+  color: #474bff;
+  border-radius: 50%;
+  box-shadow: 35.2px 0, -35.2px 0;
+  animation: dots-u8fzfthg 1s infinite linear alternate;
+}
+
+@keyframes dots-u8fzfthg {
+  0% {
+    box-shadow: 35.2px 0, -35.2px 0;
+  }
+
+  33% {
+    box-shadow: 35.2px 0, -35.2px 0 rgba(71, 75, 255, 0.13);
+    background: rgba(71, 75, 255, 0.13);
+  }
+
+  66% {
+    box-shadow: 35.2px 0 rgba(71, 75, 255, 0.13), -35.2px 0;
+    background: rgba(71, 75, 255, 0.13);
+  }
+}
