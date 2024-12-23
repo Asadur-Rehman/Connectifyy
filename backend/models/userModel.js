@@ -3,10 +3,8 @@ require("dotenv").config(); // Make sure you have dotenv set up
 // Pad the password to 32 characters
 function padPassword(password) {
   if (password.length < 32) {
-    // Pad with spaces if the password is shorter than 32 characters
     return password.padEnd(32, " ");
   } else if (password.length > 32) {
-    // Truncate if it's longer than 32 characters
     return password.substring(0, 32);
   }
   return password;
@@ -14,10 +12,7 @@ function padPassword(password) {
 
 // Transpose password using key pattern from .env
 function transposePassword(password, keyPattern) {
-  // Pad the password to 32 characters
   const paddedPassword = padPassword(password);
-
-  // Split password into 8 columns based on the length of the key pattern
   const columns = new Array(keyPattern.length).fill("");
   let index = 0;
 
@@ -26,17 +21,97 @@ function transposePassword(password, keyPattern) {
     index = (index + 1) % keyPattern.length;
   }
 
-  // Reorder the columns according to the key pattern
   let transposedPassword = "";
   keyPattern.forEach((colIndex) => {
-    transposedPassword += columns[colIndex - 1]; // keyPattern is 1-based, adjust for 0-based index
+    transposedPassword += columns[colIndex - 1];
   });
 
   return transposedPassword;
 }
 
+// Apply Vigenère cipher encryption
+function vigenereEncrypt(password, vigenereKey) {
+  const key = vigenereKey
+    .repeat(Math.ceil(password.length / vigenereKey.length))
+    .slice(0, password.length);
+  let encryptedPassword = "";
+
+  for (let i = 0; i < password.length; i++) {
+    const charCode = password.charCodeAt(i);
+    const keyCode = key.charCodeAt(i);
+
+    if (charCode >= 32 && charCode <= 126) {
+      encryptedPassword += String.fromCharCode(
+        ((charCode - 32 + (keyCode - 32)) % 95) + 32
+      );
+    } else {
+      encryptedPassword += password[i];
+    }
+  }
+
+  return encryptedPassword;
+}
+
+// Decrypt Vigenère cipher
+function vigenereDecrypt(encryptedPassword, vigenereKey) {
+  const key = vigenereKey
+    .repeat(Math.ceil(encryptedPassword.length / vigenereKey.length))
+    .slice(0, encryptedPassword.length);
+  let decryptedPassword = "";
+
+  for (let i = 0; i < encryptedPassword.length; i++) {
+    const charCode = encryptedPassword.charCodeAt(i);
+    const keyCode = key.charCodeAt(i);
+
+    if (charCode >= 32 && charCode <= 126) {
+      decryptedPassword += String.fromCharCode(
+        ((charCode - 32 - (keyCode - 32) + 95) % 95) + 32
+      );
+    } else {
+      decryptedPassword += encryptedPassword[i];
+    }
+  }
+
+  return decryptedPassword;
+}
+
+// Monoalphabetic cipher encryption
+function monoalphabeticEncrypt(password, substitutionAlphabet) {
+  const standardAlphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ";
+  let encryptedPassword = "";
+
+  for (const char of password) {
+    const index = standardAlphabet.indexOf(char);
+    if (index !== -1) {
+      encryptedPassword += substitutionAlphabet[index];
+    } else {
+      encryptedPassword += char; // Leave non-alphabetic characters unchanged
+    }
+  }
+
+  return encryptedPassword;
+}
+
+// Monoalphabetic cipher decryption
+function monoalphabeticDecrypt(encryptedPassword, substitutionAlphabet) {
+  const standardAlphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ";
+  let decryptedPassword = "";
+
+  for (const char of encryptedPassword) {
+    const index = substitutionAlphabet.indexOf(char);
+    if (index !== -1) {
+      decryptedPassword += standardAlphabet[index];
+    } else {
+      decryptedPassword += char; // Leave non-alphabetic characters unchanged
+    }
+  }
+
+  return decryptedPassword;
+}
+
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
 const userSchema = mongoose.Schema(
   {
@@ -58,25 +133,51 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// Compare password during login
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  const keyPattern = process.env.TRANSPOSITION_KEY.split(" ").map(Number); // Convert the key pattern to an array of integers
-  const transposedPassword = transposePassword(enteredPassword, keyPattern); // Apply the transposition
-  return await bcrypt.compare(transposedPassword, this.password); // Compare with the hashed password
+  const keyPattern = process.env.TRANSPOSITION_KEY.split(" ").map(Number);
+  const vigenereKey = process.env.VIGENERE_KEY;
+  const substitutionAlphabet = process.env.SUBSTITUTION_ALPHABET;
+
+  // Apply transposition cipher
+  let transformedPassword = transposePassword(enteredPassword, keyPattern);
+
+  // Apply Vigenère cipher
+  transformedPassword = vigenereEncrypt(transformedPassword, vigenereKey);
+
+  // Apply Monoalphabetic cipher
+  transformedPassword = monoalphabeticEncrypt(
+    transformedPassword,
+    substitutionAlphabet
+  );
+
+  // Compare with the stored password
+  return transformedPassword === this.password;
 };
 
+// Encrypt password during registration
 userSchema.pre("save", async function (next) {
   if (!this.isModified) {
     next();
   }
 
-  // Get the key pattern from .env
-  const keyPattern = process.env.TRANSPOSITION_KEY.split(" ").map(Number); // Convert the key pattern to an array of integers
+  const keyPattern = process.env.TRANSPOSITION_KEY.split(" ").map(Number);
+  const vigenereKey = process.env.VIGENERE_KEY;
+  const substitutionAlphabet = process.env.SUBSTITUTION_ALPHABET;
 
-  // Apply the transposition cipher
-  const transposedPassword = transposePassword(this.password, keyPattern);
+  // Apply transposition cipher
+  let transformedPassword = transposePassword(this.password, keyPattern);
 
-  // Hash the transposed password
-  this.password = await bcrypt.hash(transposedPassword, 10);
+  // Apply Vigenère cipher
+  transformedPassword = vigenereEncrypt(transformedPassword, vigenereKey);
+
+  // Apply Monoalphabetic cipher
+  transformedPassword = monoalphabeticEncrypt(
+    transformedPassword,
+    substitutionAlphabet
+  );
+
+  this.password = transformedPassword;
   next();
 });
 
