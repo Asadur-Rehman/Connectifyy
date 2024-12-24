@@ -46,7 +46,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         }
       );
+      console.log(data);
       setMessages(data);
+
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
@@ -73,6 +75,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           {
             content: newMessage,
             chatId: selectedChat,
+            userId: user._id,
           },
           {
             "Content-type": "application/json",

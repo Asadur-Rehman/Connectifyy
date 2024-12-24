@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 
 const chatModel = mongoose.Schema(
@@ -10,6 +11,7 @@ const chatModel = mongoose.Schema(
       ref: "Message",
     },
     groupAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    chatKey: { type: String, required: true, default: () => crypto.randomBytes(32).toString("hex") }, // Auto-generate chat key
   },
   { timestamps: true }
 );
