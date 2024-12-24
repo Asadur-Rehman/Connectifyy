@@ -49,23 +49,4 @@ const compareHash = (originalMessage, userId, timestamp, receivedHash) => {
     return calculatedHash === receivedHash;
 };
 
-// // Example Usage
-// const message = "How are you Saddam Hussain?";
-// const userId = "12345";
-// const timestamp = Date.now();
-
-// // Generate a hash for the message
-// const integrityHash = customHash(message, userId, timestamp);
-// console.log("Generated Hash:", integrityHash);
-
-// // Compare the hash to validate integrity
-// const isValid = compareHash(message, userId, timestamp, integrityHash);
-// console.log("Integrity Valid:", isValid); // Output: true
-
-// // Simulate tampering and re-validate
-// const tamperedMessage = "How are you Saddam Hussain";
-// const isTamperedValid = compareHash(tamperedMessage, userId, timestamp, integrityHash);
-// console.log("Tampered Integrity Valid:", isTamperedValid); // Output: false
-
-
 module.exports = { customHash, compareHash };
