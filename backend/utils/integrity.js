@@ -1,18 +1,15 @@
 const crypto = require('crypto');
 
-const SECRET_KEY = process.env.SECRET_KEY;
-console.log(SECRET_KEY)
-
-// Custom Bitwise Rotate Function
+// Helper Function: Bitwise Rotation
 const bitwiseRotate = (charCode, rotationKey) => {
-    return ((charCode << rotationKey) | (charCode >> (8 - rotationKey))) & 0xFF;
+    return ((charCode << rotationKey) | (charCode >> (8 - rotationKey))) & 0xff;
 };
 
 // Custom Hashing Function with SHA-256, Beyond XOR, and HMAC
-const customHash = (message, userId, timestamp) => {
+const customHash = (message, userId, SECRET_KEY) => {
     // Step 1: Base SHA-256 Hash
     const sha256Hash = crypto.createHash('sha256')
-        .update(message + userId + timestamp + SECRET_KEY)
+        .update(message + userId + SECRET_KEY)
         .digest('hex');
 
     // Step 2: Apply Beyond XOR Transformations
@@ -41,9 +38,9 @@ const customHash = (message, userId, timestamp) => {
 };
 
 // Compare Method to Ensure Integrity
-const compareHash = (originalMessage, userId, timestamp, receivedHash) => {
-    // Recalculate the hash for the provided message, userId, and timestamp
-    const calculatedHash = customHash(originalMessage, userId, timestamp);
+const compareHash = (originalMessage, userId, receivedHash, SECRET_KEY) => {
+    // Recalculate the hash for the provided message and userId
+    const calculatedHash = customHash(originalMessage, userId, SECRET_KEY);
 
     // Compare the recalculated hash with the received hash
     return calculatedHash === receivedHash;
