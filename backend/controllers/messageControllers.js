@@ -30,7 +30,7 @@ const allMessages = async (req, res) => {
       } else {
         validatedMessages.push({
           ...message.toObject(),
-          integrity: "tampered",
+          integrity: "tempered",
         });
       }
     }
