@@ -46,7 +46,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         }
       );
+      console.log(data);
       setMessages(data);
+
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);

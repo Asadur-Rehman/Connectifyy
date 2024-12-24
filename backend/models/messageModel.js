@@ -8,7 +8,7 @@ const messageSchema = mongoose.Schema(
     content: { type: String, trim: true },
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
     readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    hash: { type: String, required: true, immutable: true }, // Integrity hash (immutable)
+    hash: { type: String }, // Integrity hash (immutable)
   },
   { timestamps: true }
 );
@@ -23,7 +23,11 @@ messageSchema.pre("save", async function (next) {
         throw new Error("ChatKey not found for the associated chat.");
       }
       // Compute and assign the hash
-      this.hash = customHash(this.content, this.sender.toString(), chat.chatKey);
+      this.hash = customHash(
+        this.content,
+        this.sender.toString(),
+        chat.chatKey
+      );
     } catch (error) {
       return next(error);
     }
@@ -31,13 +35,13 @@ messageSchema.pre("save", async function (next) {
   next();
 });
 
-// Prevent hash updates explicitly (just in case)
-messageSchema.pre("findOneAndUpdate", async function (next) {
-  if (this._update.hash) {
-    return next(new Error("Hash field cannot be updated."));
-  }
-  next();
-});
+// // Prevent hash updates explicitly (just in case)
+// messageSchema.pre("findOneAndUpdate", async function (next) {
+//   if (this._update.hash) {
+//     return next(new Error("Hash field cannot be updated."));
+//   }
+//   next();
+// });
 
 const Message = mongoose.model("Message", messageSchema);
 module.exports = Message;
