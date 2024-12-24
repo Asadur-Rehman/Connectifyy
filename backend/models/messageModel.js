@@ -8,21 +8,22 @@ const messageSchema = mongoose.Schema(
     content: { type: String, trim: true },
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
     readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    hash: { type: String, required: true }, // Integrity hash
+    hash: { type: String, required: true, immutable: true }, // Integrity hash (immutable)
   },
   { timestamps: true }
 );
 
 // Middleware to compute hash before saving the document
 messageSchema.pre("save", async function (next) {
-  if (this.isModified("content") || this.isNew) {
+  // Only calculate the hash when the document is being created
+  if (this.isNew) {
     try {
       const chat = await Chat.findById(this.chat).select("chatKey"); // Fetch ChatKey
       if (!chat || !chat.chatKey) {
         throw new Error("ChatKey not found for the associated chat.");
       }
-      const timestamp = this.createdAt || new Date();
-      this.hash = customHash(this.content, this.sender.toString(), timestamp.toISOString(), chat.chatKey);
+      // Compute and assign the hash
+      this.hash = customHash(this.content, this.sender.toString(), chat.chatKey);
     } catch (error) {
       return next(error);
     }
@@ -30,20 +31,10 @@ messageSchema.pre("save", async function (next) {
   next();
 });
 
-// Middleware to compute hash during updates
+// Prevent hash updates explicitly (just in case)
 messageSchema.pre("findOneAndUpdate", async function (next) {
-  if (this._update.content) {
-    try {
-      const message = await this.model.findOne(this.getQuery());
-      const chat = await Chat.findById(message.chat).select("chatKey"); // Fetch ChatKey
-      if (!chat || !chat.chatKey) {
-        throw new Error("ChatKey not found for the associated chat.");
-      }
-      const timestamp = message.createdAt || new Date();
-      this._update.hash = customHash(this._update.content, message.sender.toString(), timestamp.toISOString(), chat.chatKey);
-    } catch (error) {
-      return next(error);
-    }
+  if (this._update.hash) {
+    return next(new Error("Hash field cannot be updated."));
   }
   next();
 });
