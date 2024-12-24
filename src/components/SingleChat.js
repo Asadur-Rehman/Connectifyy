@@ -73,6 +73,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           {
             content: newMessage,
             chatId: selectedChat,
+            userId: user._id,
           },
           {
             "Content-type": "application/json",
