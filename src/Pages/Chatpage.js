@@ -9,7 +9,7 @@ const MyChats = lazy(() => import("../components/MyChats"));
 const Chatpage = () => {
   const [fetchAgain, setFetchAgain] = useState(false);
   const { user } = ChatState();
-  console.log("user", user);
+  // console.log("user", user);
 
   return (
     <div style={{ width: "100%" }}>

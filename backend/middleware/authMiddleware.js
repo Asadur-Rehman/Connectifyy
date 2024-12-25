@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const { validateToken} = require('../utils/generateToken.js')
 const User = require("../models/userModel.js");
 
 const protect = async (req, res, next) => {
@@ -10,11 +10,12 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: `Token Missing` });
     }
     try {
-      // Verifying the JWT using the secret key stored in environment variables
-      const decode = jwt.verify(token, process.env.JWT_SECRET);
-      // console.log("decode",decode)
+      // Verifying the Token using our custom tokenValidator function
+      const decode = validateToken(token);
+      console.log("decode",decode)
+      // console.log("decoded user:", decode);
 
-      req.user = await User.findById(decode.id).select("-password");
+      req.user = await User.findById(decode.userId).select("-password");
       // console.log("r", req.user);
     } catch (error) {
       // If JWT verification fails, return 401 Unauthorized response

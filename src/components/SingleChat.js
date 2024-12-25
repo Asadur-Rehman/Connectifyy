@@ -37,7 +37,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     try {
       setLoading(true);
-
+      
       const { data } = await apiConnector(
         "get",
         `${ALLMESSAGE_API}/${selectedChat._id}`,

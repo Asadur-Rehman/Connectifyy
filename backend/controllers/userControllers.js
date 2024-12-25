@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const generateToken = require("../utils/generateToken");
+const {generateToken} = require("../utils/generateToken");
 
 //@description     Get or Search all users
 //@route           GET /api/user?search=
