@@ -22,8 +22,8 @@ const allMessages = async (req, res) => {
         chatKey
       );
 
-      console.log("Hashes\n", message.hash);
-      console.log(recalculatedHash);
+      // console.log("Hashes\n", message.hash);
+      // console.log(recalculatedHash);
 
       if (recalculatedHash === message.hash) {
         validatedMessages.push({ ...message.toObject(), integrity: "valid" });
@@ -35,7 +35,7 @@ const allMessages = async (req, res) => {
       }
     }
 
-    console.log(validatedMessages);
+    // console.log(validatedMessages);
     return res.status(200).json(validatedMessages);
   } catch (error) {
     return res.status(500).json({

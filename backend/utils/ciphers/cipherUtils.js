@@ -30,6 +30,33 @@ function transposePassword(password, keyPattern) {
   return transposedPassword;
 }
 
+function reverseTransposePassword(transposedPassword, keyPattern) {
+  const columns = new Array(keyPattern.length).fill("");
+  let index = 0;
+
+  // Fill columns based on pattern
+  keyPattern.forEach((colIndex) => {
+    const colLength = Math.ceil(transposedPassword.length / keyPattern.length);
+    columns[colIndex - 1] = transposedPassword.slice(
+      index,
+      index + colLength
+    );
+    index += colLength;
+  });
+
+  // Reconstruct the original password row-wise
+  let originalPassword = "";
+  for (let i = 0; i < columns[0].length; i++) {
+    for (let j = 0; j < columns.length; j++) {
+      if (columns[j][i]) {
+        originalPassword += columns[j][i];
+      }
+    }
+  }
+
+  return originalPassword.trim();
+}
+
 // Apply Vigenère cipher encryption
 function vigenereEncrypt(password, vigenereKey) {
   const key = vigenereKey
@@ -73,7 +100,7 @@ function vigenereDecrypt(encryptedPassword, vigenereKey) {
     }
   }
 
-  return decryptedPassword;
+  return decryptedPassword.trim();
 }
 
 // Monoalphabetic cipher encryption
@@ -109,7 +136,7 @@ function monoalphabeticDecrypt(encryptedPassword, substitutionAlphabet) {
     }
   }
 
-  return decryptedPassword;
+  return decryptedPassword.trim();
 }
 
 module.exports = {
@@ -119,4 +146,5 @@ module.exports = {
   vigenereDecrypt,
   monoalphabeticEncrypt,
   monoalphabeticDecrypt,
+  reverseTransposePassword
 };
