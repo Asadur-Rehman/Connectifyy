@@ -4,9 +4,9 @@ const {
   monoalphabeticDecrypt,
   vigenereEncrypt,
   vigenereDecrypt,
-  transposePassword,
+  transposeCipher,
   padPassword,
-  reverseTransposePassword
+  reverseTransposeCipher,
 } = require("./ciphers/cipherUtils");
 
 const substitutionAlphabet =
@@ -18,12 +18,15 @@ const vigenereKey = "SECRETKEY"; // Example Vigenère key
 const generateToken = (id) => {
   const userId = id.toString(); // Convert ID to string to use as input
   const paddedUserId = padPassword(userId);
-  const transposedUserId = transposePassword(paddedUserId, keyPattern);
+  const transposedUserId = transposeCipher(paddedUserId, keyPattern);
   const monoEncryptedUserId = monoalphabeticEncrypt(
     transposedUserId,
     substitutionAlphabet
   );
-  const vigenereEncryptedUserId = vigenereEncrypt(monoEncryptedUserId, vigenereKey);
+  const vigenereEncryptedUserId = vigenereEncrypt(
+    monoEncryptedUserId,
+    vigenereKey
+  );
 
   const metadata = `${Date.now() + 30 * 24 * 60 * 60 * 1000}`; // Add expiration timestamp
   const token = `${vigenereEncryptedUserId}|${metadata}`;
@@ -43,10 +46,7 @@ const validateToken = (token) => {
     vigenereDecrypted,
     substitutionAlphabet
   );
-  const userId = reverseTransposePassword(
-    monoDecrypted,
-    keyPattern
-  ); // Reverse transposition
+  const userId = reverseTransposeCipher(monoDecrypted, keyPattern); // Reverse transposition
 
   return { userId };
 };

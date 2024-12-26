@@ -11,8 +11,8 @@ function padPassword(password) {
   return password;
 }
 
-// Transpose password using key pattern from .env
-function transposePassword(password, keyPattern) {
+// Transpose text using key pattern from .env
+function transposeCipher(password, keyPattern) {
   const paddedPassword = padPassword(password);
   const columns = new Array(keyPattern.length).fill("");
   let index = 0;
@@ -30,7 +30,7 @@ function transposePassword(password, keyPattern) {
   return transposedPassword;
 }
 
-function reverseTransposePassword(transposedPassword, keyPattern) {
+function reverseTransposeCipher(transposedPassword, keyPattern) {
   const columns = new Array(keyPattern.length).fill("");
   let index = 0;
 
@@ -141,10 +141,10 @@ function monoalphabeticDecrypt(encryptedPassword, substitutionAlphabet) {
 
 module.exports = {
   padPassword,
-  transposePassword,
+  transposeCipher,
   vigenereEncrypt,
   vigenereDecrypt,
   monoalphabeticEncrypt,
   monoalphabeticDecrypt,
-  reverseTransposePassword
+  reverseTransposeCipher
 };

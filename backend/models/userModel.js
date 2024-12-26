@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const {
-  transposePassword,
+  transposeCipher,
   vigenereEncrypt,
   monoalphabeticEncrypt,
 } = require("../utils/ciphers/cipherUtils");
@@ -33,7 +33,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   const vigenereKey = process.env.VIGENERE_KEY;
   const substitutionAlphabet = process.env.SUBSTITUTION_ALPHABET;
 
-  let transformedPassword = transposePassword(enteredPassword, keyPattern);
+  let transformedPassword = transposeCipher(enteredPassword, keyPattern);
   transformedPassword = vigenereEncrypt(transformedPassword, vigenereKey);
   transformedPassword = monoalphabeticEncrypt(
     transformedPassword,
@@ -53,7 +53,7 @@ userSchema.pre("save", async function (next) {
   const vigenereKey = process.env.VIGENERE_KEY;
   const substitutionAlphabet = process.env.SUBSTITUTION_ALPHABET;
 
-  let transformedPassword = transposePassword(this.password, keyPattern);
+  let transformedPassword = transposeCipher(this.password, keyPattern);
   transformedPassword = vigenereEncrypt(transformedPassword, vigenereKey);
   transformedPassword = monoalphabeticEncrypt(
     transformedPassword,

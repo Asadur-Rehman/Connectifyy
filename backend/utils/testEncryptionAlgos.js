@@ -4,9 +4,9 @@ const {
   monoalphabeticDecrypt,
   vigenereEncrypt,
   vigenereDecrypt,
-  transposePassword,
+  transposeCipher,
   padPassword,
-  reverseTransposePassword,
+  reverseTransposeCipher,
 } = require("./ciphers/cipherUtils");
 
 const testWithPadding = () => {
@@ -21,7 +21,7 @@ const testWithPadding = () => {
   console.log("Padded Password:", paddedPassword);
 
   // Step 2: Transposition
-  const transposed = transposePassword(paddedPassword, keyPattern);
+  const transposed = transposeCipher(paddedPassword, keyPattern);
   console.log("Transposed:", transposed);
 
   // Step 3: Monoalphabetic Encryption
@@ -41,7 +41,7 @@ const testWithPadding = () => {
   console.log("Mono Decrypted:", monoDecrypted);
 
   // Step 7: Reverse Transposition
-  const reversedTransposed = reverseTransposePassword(monoDecrypted, keyPattern);
+  const reversedTransposed = reverseTransposeCipher(monoDecrypted, keyPattern);
   console.log("Reversed Transposed:", reversedTransposed);
 
   // Step 8: Trim Padding

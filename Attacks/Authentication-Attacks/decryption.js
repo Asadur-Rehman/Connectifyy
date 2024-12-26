@@ -11,7 +11,7 @@ function padPassword(password) {
 }
 
 // Transpose password using key pattern from .env
-function reverseTransposePassword(transposedPassword, keyPattern) {
+function reverseTransposeCipher(transposedPassword, keyPattern) {
   const paddedLength = transposedPassword.length;
   const columns = new Array(keyPattern.length).fill("");
 
@@ -103,14 +103,14 @@ function decryptPassword(encryptedPassword) {
   console.log("After Vigenère Decryption:", step2);
 
   // Step 3: Reverse Transposition Cipher
-  const step3 = reverseTransposePassword(step2, keyPattern);
+  const step3 = reverseTransposeCipher(step2, keyPattern);
   console.log("After Transposition Decryption:", step3);
 
   return step3;
 }
 
 // Encrypted password given to the attacker
-const encryptedPassword = "zcbyzchcwicbyochLwicbyochcwicbyo";
+const encryptedPassword = "zcbybchcficbfochUwicCyoc[cwiPbyo";
 
 // Decrypt the password
 const decryptedPassword = decryptPassword(encryptedPassword);
